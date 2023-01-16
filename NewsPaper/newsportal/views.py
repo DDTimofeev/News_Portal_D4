@@ -6,6 +6,8 @@ from django.views.generic import ListView, DetailView, CreateView, UpdateView, D
 from .models import Post
 from .filters import PostFilter
 from .forms import NewForm
+from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.auth.mixins import PermissionRequiredMixin
 
 
 class NewsList(ListView):
@@ -40,7 +42,7 @@ class NewDetail(DetailView):
     model = Post
     # Используем другой шаблон — new.html
     template_name = 'new.html'
-    # Название объекта, в котором будет выбранна пользователем новость
+    # Название объекта, в котором будет выбрана пользователем новость
     context_object_name = 'new'
 
 
@@ -77,10 +79,12 @@ class NewsSearch(ListView):
         return context
 
 
-class NewCreate(CreateView):
+class NewCreate(PermissionRequiredMixin, CreateView):
+    permission_required = ('newsportal.add_post',)
+    raise_exception = True
     form_class = NewForm
     model = Post
-    template_name = 'post_edit.html'
+    template_name = 'post_create.html'
 
     def form_valid(self, form):
         post = form.save(commit=False)
@@ -88,7 +92,8 @@ class NewCreate(CreateView):
         return super().form_valid(form)
 
 
-class NewUpdate(UpdateView):
+class NewUpdate(PermissionRequiredMixin, UpdateView):
+    permission_required = ('newsportal.update_post',)
     form_class = NewForm
     model = Post
     template_name = 'post_edit.html'
@@ -100,7 +105,8 @@ class NewUpdate(UpdateView):
 
 
 # Представление удаляющее пост.
-class NewDelete(DeleteView):
+class NewDelete(PermissionRequiredMixin, DeleteView):
+    permission_required = ('newsportal.delete_post',)
     model = Post
     template_name = 'post_delete.html'
     success_url = reverse_lazy('news_list')
