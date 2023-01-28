@@ -2,6 +2,7 @@ from django.db import models
 from django.contrib.auth.models import User
 from django.db.models import Sum
 from django.urls import reverse
+from django.core.validators import MinValueValidator
 
 
 class Author(models.Model):
@@ -23,9 +24,13 @@ class Author(models.Model):
 
 class Category(models.Model):
     name = models.CharField(max_length=64, unique=True)
+    subscribers = models.ManyToManyField(User)
+    def __str__(self):
+        return f'{self.name}'
 
 
 class Post(models.Model):
+    objects = None
     author = models.ForeignKey(Author, on_delete=models.CASCADE)
 
     NEWS = 'NW'
@@ -78,3 +83,15 @@ class Comment(models.Model):
     def dislike(self):
         self.rating -= 1
         self.save()
+
+class Subscription(models.Model):
+    user = models.ForeignKey(
+        to=User,
+        on_delete=models.CASCADE,
+        related_name='subscriptions',
+    )
+    category = models.ForeignKey(
+        to='Category',
+        on_delete=models.CASCADE,
+        related_name='subscriptions',
+    )
