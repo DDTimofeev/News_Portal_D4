@@ -35,10 +35,10 @@ def my_job():
     msg = EmailMultiAlternatives(
         subject = 'Статьи за неделю',
         body = '',
-        from_email=settings.DEFAULT_FROM_EMAIl,
+        from_email=settings.DEFAULT_FROM_EMAIL,
         to = subscribers,
     )
-    msg.attach_alternetive(html_content, 'txt/html')
+    msg.attach_alternative(html_content, 'txt/html')
     msg.send()
     # print (subscribers)
 
@@ -56,7 +56,7 @@ class Command(BaseCommand):
 
         scheduler.add_job(
             my_job,
-            trigger=CronTrigger(day_of_week="fri", minute="00", hour="18"),
+            trigger=CronTrigger(day_of_week="sun", minute="17", hour="13"),
             id="my_job",  # The `id` assigned to each job MUST be unique
             max_instances=1,
             replace_existing=True,
